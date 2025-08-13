@@ -148,6 +148,7 @@ const Services: React.FC = () => {
               fontWeight: 500
             }}>
               {port.port || port.targetPort}{port.protocol ? `/${port.protocol}` : ''}
+              {port.nodePort ? `:${port.nodePort}` : ''}
             </div>
           ));
         }
@@ -162,6 +163,7 @@ const Services: React.FC = () => {
             fontWeight: 500
           }}>
             {value.port || value.targetPort}{value.protocol ? `/${value.protocol}` : ''}
+            {value.nodePort ? `:${value.nodePort}` : ''}
           </span>
         );
       }

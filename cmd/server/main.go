@@ -6,13 +6,27 @@ import (
 	"os"
 
 	"kubelens/internal/db"
+	"kubelens/internal/k8s"
 
 	"github.com/gin-gonic/gin"
 )
 
+var k8sClient *k8s.Client
+
 func main() {
 	pgURL := getenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/kubelens?sslmode=disable")
-	listenAddr := getenv("LISTEN_ADDR", ":8081")
+	listenAddr := getenv("LISTEN_ADDR", ":8082")
+
+	// Initialize k8s client
+	var err error
+	k8sClient, err = k8s.NewClient()
+	if err != nil {
+		log.Printf("Failed to create k8s client: %v", err)
+		panic(err)
+	}
+	log.Printf("K8s client initialized successfully")
+	// Assign k8s client to handlers
+	k8s.K8sClient = k8sClient
 
 	// connect db (optional in dev)
 	store, err := db.New(pgURL)
@@ -41,21 +55,19 @@ func main() {
 	r.GET("/api/health", func(c *gin.Context) { c.JSON(200, gin.H{"status": "ok"}) })
 
 	// Kubernetes endpoints
-	r.GET("/api/namespaces", getNamespaces)
-	r.GET("/api/workloads", getWorkloads)
-	r.GET("/api/pods", getPods)
-	r.GET("/api/nodes", getNodes)
-	r.GET("/api/events", getEvents)
-	r.GET("/api/metrics/nodes", getNodeMetrics)
-	r.GET("/api/metrics/pods", getPodMetrics)
-	r.GET("/api/services", getServices)
-	r.GET("/api/configmaps", getConfigMaps)
-	r.GET("/api/pvs", getPVs)
-	r.GET("/api/pvcs", getPVCs)
-	// Summary endpoint for dashboard
-	r.GET("/api/summary", getSummary)
-	// Notifications (placeholder)
-	r.GET("/api/notifications", getNotifications)
+	r.GET("/api/namespaces", k8s.GetNamespacesHandlerFunc)
+	r.GET("/api/workloads", k8s.GetWorkloadsHandlerFunc)
+	r.GET("/api/pods", k8s.GetPodsHandlerFunc)
+	r.GET("/api/nodes", k8s.GetNodesHandlerFunc)
+	r.GET("/api/events", k8s.GetEventsHandlerFunc)
+	r.GET("/api/metrics/nodes", k8s.GetNodeMetricsHandlerFunc)
+	r.GET("/api/metrics/pods", k8s.GetPodMetricsHandlerFunc)
+	r.GET("/api/services", k8s.GetServicesHandlerFunc)
+	r.GET("/api/configmaps", k8s.GetConfigMapsHandlerFunc)
+	r.GET("/api/pvs", k8s.GetPVsHandlerFunc)
+	r.GET("/api/pvcs", k8s.GetPVCsHandlerFunc)
+	r.GET("/api/summary", k8s.GetSummaryHandlerFunc)
+	r.GET("/api/notifications", k8s.GetNotificationsHandlerFunc)
 
 	log.Printf("Starting KubeLens server on %s", listenAddr)
 	if err := r.Run(listenAddr); err != nil {
