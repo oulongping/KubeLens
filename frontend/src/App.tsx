@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Pods from './pages/Pods';
 import Nodes from './pages/Nodes';
 import Workloads from './pages/Workloads';
 import Events from './pages/Events';
 import Services from './pages/Services';
+import Sidebar from './components/Sidebar';
 
 function App() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const location = useLocation();
+  const fadeInRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // 检查本地存储的主题设置
@@ -31,6 +34,16 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    // 页面切换时触发动画
+    if (fadeInRef.current) {
+      fadeInRef.current.classList.remove('loaded');
+      // 触发重排
+      void fadeInRef.current.offsetWidth;
+      fadeInRef.current.classList.add('loaded');
+    }
+  }, [location]);
+
   const toggleTheme = () => {
     const newTheme = !isDarkTheme;
     setIsDarkTheme(newTheme);
@@ -43,92 +56,37 @@ function App() {
     }
   };
 
-  const headerStyle: React.CSSProperties = {
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-    display: 'flex',
-    alignItems: 'center',
-    padding: '16px 24px',
-    minHeight: '72px',
-    justifyContent: 'space-between'
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
   };
-  
-  const navStyle: React.CSSProperties = {
-    display: 'flex',
-    gap: '8px',
-    alignItems: 'center',
-    flexWrap: 'wrap'
-  };
-
-  const linkStyle = ({ isActive }: any) => ({
-    padding: '8px 16px',
-    borderRadius: '8px',
-    color: isActive ? (isDarkTheme ? '#93c5fd' : '#1d4ed8') : (isDarkTheme ? '#cbd5e1' : '#6b7280'),
-    background: isActive ? (isDarkTheme ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)') : 'transparent',
-    textDecoration: 'none',
-    fontWeight: isActive ? 600 : 500,
-    fontSize: '14px',
-    transition: 'all 0.2s ease',
-    border: isActive ? (isDarkTheme ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(59, 130, 246, 0.2)') : '1px solid transparent',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px'
-  });
-
-  const containerStyle: React.CSSProperties = {
-    minHeight: '100vh',
-    background: isDarkTheme ? '#0f172a' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-  };
-
-  const mainStyle: React.CSSProperties = {
-    padding: '24px',
-    maxWidth: '1400px',
-    margin: '0 auto',
-    minHeight: 'calc(100vh - 72px)'
-  };
-
-  const navItems = [
-    { path: '/', label: '总览', icon: '📊', exact: true },
-    { path: '/pods', label: 'Pods', icon: '🚀' },
-    { path: '/workloads', label: '工作负载', icon: '⚙️' },
-    { path: '/nodes', label: '节点', icon: '🖥️' },
-    { path: '/services', label: '服务', icon: '🌐' },
-    { path: '/events', label: '事件', icon: '📋' }
-  ];
 
   return (
-    <div style={containerStyle}>
-      <header className="glass-header" style={headerStyle}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-          <div className="gradient-text" style={{ fontSize: '24px', fontWeight: 800 }}>
-            KubeLens
-          </div>
-          <nav style={navStyle}>
-            {navItems.map((item) => (
-              <NavLink 
-                key={item.path}
-                to={item.path}
-                end={item.exact}
-                style={linkStyle}
-              >
-                <span>{item.icon}</span>
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </nav>
+    <div className="app-container">
+      <Sidebar isCollapsed={isSidebarCollapsed} onToggle={toggleSidebar} />
+      <header className="topbar">
+        <div className="topbar-left">
+          <h1 className="kubelens-page-title">
+            {location.pathname === '/' && '📊 集群总览'}
+            {location.pathname === '/pods' && '🚀 Pods'}
+            {location.pathname === '/workloads' && '⚙️ 工作负载'}
+            {location.pathname === '/nodes' && '🖥️ 节点'}
+            {location.pathname === '/services' && '🌐 服务'}
+            {location.pathname === '/events' && '📋 事件'}
+          </h1>
         </div>
-        <button 
-          onClick={toggleTheme}
-          className="theme-toggle"
-          aria-label="切换主题"
-          title={`切换到${isDarkTheme ? '浅色' : '深色'}主题`}
-        >
-          {isDarkTheme ? '☀️' : '🌙'}
-        </button>
+        <div className="topbar-right">
+          <button 
+            onClick={toggleTheme}
+            className="kubelens-btn kubelens-btn-icon kubelens-btn-secondary"
+            aria-label="切换主题"
+            title={`切换到${isDarkTheme ? '浅色' : '深色'}主题`}
+          >
+            {isDarkTheme ? '☀️' : '🌙'}
+          </button>
+        </div>
       </header>
-      <main style={mainStyle}>
-        <div className="fade-in">
+      <main className="main-content">
+        <div ref={fadeInRef} className="fade-in">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/pods" element={<Pods />} />

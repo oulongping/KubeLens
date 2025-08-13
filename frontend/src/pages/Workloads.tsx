@@ -100,13 +100,7 @@ const Workloads: React.FC = () => {
       title: '命名空间',
       width: '150px',
       render: (value: string) => (
-        <span style={{ 
-          padding: '4px 8px', 
-          background: '#f3f4f6', 
-          borderRadius: '4px', 
-          fontSize: '12px',
-          fontWeight: 500
-        }}>
+        <span className="kubelens-namespace-badge">
           {value}
         </span>
       )
@@ -121,7 +115,15 @@ const Workloads: React.FC = () => {
       key: 'ready',
       title: '就绪',
       width: '100px',
-      render: (value: string) => getReadyStatus(value)
+      render: (value: string) => {
+        const [current, desired] = value.split('/').map(Number);
+        const isReady = !isNaN(current) && !isNaN(desired) && current === desired && desired > 0;
+        return (
+          <span className={`kubelens-ready-cell ${isReady ? 'kubelens-ready-success' : 'kubelens-ready-warning'}`}>
+            {value}
+          </span>
+        );
+      }
     },
     {
       key: 'upToDate',
@@ -140,51 +142,32 @@ const Workloads: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px' 
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          ⚙️ 工作负载
-        </h1>
+    <div className="kubelens-workloads">
+      <div className="kubelens-workloads-header">
         <button 
           onClick={fetchData}
-          className="btn btn-primary"
-          style={{ padding: '12px 24px' }}
+          className="kubelens-btn kubelens-btn-primary"
         >
           🔄 刷新
         </button>
       </div>
 
-      <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr auto auto', 
-          gap: '16px', 
-          alignItems: 'center' 
-        }}>
-          <input
-            type="text"
-            placeholder="搜索工作负载..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input"
-            style={{ fontSize: '14px' }}
-          />
+      <div className="kubelens-card kubelens-workloads-filters">
+        <div className="kubelens-workloads-filter-controls">
+          <div className="kubelens-search-container">
+            <span className="kubelens-search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="搜索工作负载..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="kubelens-input"
+            />
+          </div>
           <select
             value={selectedNamespace}
             onChange={(e) => setSelectedNamespace(e.target.value)}
-            className="select"
-            style={{ minWidth: '150px' }}
+            className="kubelens-select"
           >
             <option value="all">所有命名空间</option>
             {namespaces.map(ns => (
@@ -194,8 +177,7 @@ const Workloads: React.FC = () => {
           <select
             value={selectedKind}
             onChange={(e) => setSelectedKind(e.target.value)}
-            className="select"
-            style={{ minWidth: '120px' }}
+            className="kubelens-select"
           >
             <option value="all">所有类型</option>
             {workloadKinds.map(kind => (
@@ -205,18 +187,22 @@ const Workloads: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          alignItems: 'center',
-          color: '#fff',
-          fontSize: '14px'
-        }}>
-          <span>总计: <strong>{filteredWorkloads.length}</strong> 个工作负载</span>
-          <span>Deployment: <strong>{filteredWorkloads.filter(w => w.kind === 'Deployment').length}</strong></span>
-          <span>StatefulSet: <strong>{filteredWorkloads.filter(w => w.kind === 'StatefulSet').length}</strong></span>
-          <span>DaemonSet: <strong>{filteredWorkloads.filter(w => w.kind === 'DaemonSet').length}</strong></span>
+      <div className="kubelens-stats">
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">总计工作负载</div>
+          <div className="kubelens-stat-value">{filteredWorkloads.length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">Deployment</div>
+          <div className="kubelens-stat-value">{filteredWorkloads.filter(w => w.kind === 'Deployment').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">StatefulSet</div>
+          <div className="kubelens-stat-value">{filteredWorkloads.filter(w => w.kind === 'StatefulSet').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">DaemonSet</div>
+          <div className="kubelens-stat-value">{filteredWorkloads.filter(w => w.kind === 'DaemonSet').length}</div>
         </div>
       </div>
 

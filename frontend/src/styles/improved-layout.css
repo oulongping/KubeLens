@@ -1,0 +1,209 @@
+/* KubeLens 优化布局样式 */
+
+/* 优化的页面容器 */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  transition: all var(--transition-normal);
+}
+
+/* 优化的主内容区域 */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: var(--spacing-6);
+  transition: margin-left var(--transition-normal);
+}
+
+.app-container .sidebar.collapsed ~ .main-content {
+  margin-left: 80px;
+}
+
+/* 优化的顶部栏 */
+topbar {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-4) var(--spacing-6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: all var(--transition-normal);
+}
+
+body.dark-theme .topbar {
+  background: rgba(30, 41, 59, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+/* 优化的页面标题 */
+.kubelens-page-title {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 优化的卡片样式 */
+.kubelens-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: var(--spacing-6);
+  transition: all var(--transition-normal);
+}
+
+.kubelens-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.dark-theme .kubelens-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .kubelens-card:hover {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+/* 优化的按钮样式 */
+.kubelens-btn {
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.kubelens-btn-primary {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+  color: white;
+}
+
+.kubelens-btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 优化的输入框样式 */
+.kubelens-input, .kubelens-select {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: rgba(255, 255, 255, 0.8);
+  transition: all var(--transition-normal);
+}
+
+.kubelens-input:focus, .kubelens-select:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+}
+
+body.dark-theme .kubelens-input, body.dark-theme .kubelens-select {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--gray-100);
+}
+
+body.dark-theme .kubelens-input:focus, body.dark-theme .kubelens-select:focus {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.3);
+}
+
+/* 优化的统计信息样式 */
+.kubelens-stats {
+  display: flex;
+  gap: var(--spacing-6);
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-6);
+}
+
+.kubelens-stat-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-4);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  flex: 1;
+  min-width: 200px;
+  transition: all var(--transition-normal);
+}
+
+.kubelens-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+body.dark-theme .kubelens-stat-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .kubelens-stat-card:hover {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.kubelens-stat-value {
+  font-size: var(--font-3xl);
+  font-weight: 700;
+  margin: var(--spacing-2) 0;
+  background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.kubelens-stat-label {
+  color: var(--gray-600);
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+body.dark-theme .kubelens-stat-label {
+  color: var(--gray-400);
+}
+
+/* 页面切换淡入动画 */
+.fade-in {
+  animation: fadeIn var(--transition-normal) ease-in;
+  opacity: 0;
+}
+
+.fade-in.loaded {
+  opacity: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

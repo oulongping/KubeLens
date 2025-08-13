@@ -100,12 +100,7 @@ const Nodes: React.FC = () => {
       title: 'Kubernetes 版本',
       width: '150px',
       render: (value: string) => (
-        <code style={{ 
-          background: '#f1f5f9', 
-          padding: '2px 6px', 
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
+        <code className="kubelens-code kubelens-code-version">
           {value}
         </code>
       )
@@ -115,12 +110,7 @@ const Nodes: React.FC = () => {
       title: '内部 IP',
       width: '140px',
       render: (value: string) => (
-        <code style={{ 
-          background: '#f1f5f9', 
-          padding: '2px 6px', 
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
+        <code className="kubelens-code kubelens-code-ip">
           {value || '-'}
         </code>
       )
@@ -131,13 +121,7 @@ const Nodes: React.FC = () => {
       width: '140px',
       render: (value: string) => (
         value ? (
-          <code style={{ 
-            background: '#ecfdf5', 
-            color: '#065f46',
-            padding: '2px 6px', 
-            borderRadius: '4px',
-            fontSize: '12px'
-          }}>
+          <code className="kubelens-code kubelens-code-external-ip">
             {value}
           </code>
         ) : '-'
@@ -150,54 +134,42 @@ const Nodes: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px' 
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          🖥️ 节点
-        </h1>
+    <div className="kubelens-nodes">
+      <div className="kubelens-nodes-header">
         <button 
           onClick={fetchData}
-          className="btn btn-primary"
-          style={{ padding: '12px 24px' }}
+          className="kubelens-btn kubelens-btn-primary"
         >
           🔄 刷新
         </button>
       </div>
 
-      <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
+      <div className="kubelens-card kubelens-nodes-search">
         <input
           type="text"
           placeholder="搜索节点..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="input"
-          style={{ fontSize: '14px', width: '100%' }}
+          className="kubelens-input"
         />
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          alignItems: 'center',
-          color: '#fff',
-          fontSize: '14px'
-        }}>
-          <span>总计: <strong>{filteredNodes.length}</strong> 个节点</span>
-          <span>就绪: <strong>{filteredNodes.filter(n => n.status === 'Ready').length}</strong></span>
-          <span>未就绪: <strong>{filteredNodes.filter(n => n.status === 'NotReady').length}</strong></span>
-          <span>主节点: <strong>{filteredNodes.filter(n => n.roles.includes('master') || n.roles.includes('control-plane')).length}</strong></span>
+      <div className="kubelens-stats">
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">总计节点</div>
+          <div className="kubelens-stat-value">{filteredNodes.length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">就绪</div>
+          <div className="kubelens-stat-value">{filteredNodes.filter(n => n.status === 'Ready').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">未就绪</div>
+          <div className="kubelens-stat-value">{filteredNodes.filter(n => n.status === 'NotReady').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">主节点</div>
+          <div className="kubelens-stat-value">{filteredNodes.filter(n => n.roles.includes('master') || n.roles.includes('control-plane')).length}</div>
         </div>
       </div>
 

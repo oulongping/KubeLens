@@ -79,13 +79,7 @@ const Pods: React.FC = () => {
       title: '命名空间',
       width: '150px',
       render: (value: string) => (
-        <span style={{ 
-          padding: '4px 8px', 
-          background: '#f3f4f6', 
-          borderRadius: '4px', 
-          fontSize: '12px',
-          fontWeight: 500
-        }}>
+        <span className="kubelens-namespace-badge">
           {value}
         </span>
       )
@@ -106,10 +100,7 @@ const Pods: React.FC = () => {
       title: '重启次数',
       width: '100px',
       render: (value: number) => (
-        <span style={{ 
-          color: value > 0 ? '#f59e0b' : '#6b7280',
-          fontWeight: value > 0 ? 600 : 400
-        }}>
+        <span className={`kubelens-count-cell ${value > 0 ? 'kubelens-count-warning' : ''}`}>
           {value}
         </span>
       )
@@ -126,70 +117,34 @@ const Pods: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px',
-        flexWrap: 'wrap',
-        gap: '16px'
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          🚀 Pods
-        </h1>
-        <div style={{ display: 'flex', gap: '12px' }}>
+    <div className="kubelens-pods">
+      <div className="kubelens-pods-header">
+        <div className="kubelens-pods-actions">
           <button 
             onClick={fetchData}
-            className="btn btn-primary"
-            style={{ padding: '12px 24px' }}
+            className="kubelens-btn kubelens-btn-primary"
           >
             🔄 刷新
           </button>
         </div>
       </div>
 
-      <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr auto', 
-          gap: '16px', 
-          alignItems: 'center'
-        }}>
-          <div style={{ position: 'relative' }}>
+      <div className="kubelens-card kubelens-pods-filters">
+        <div className="kubelens-pods-filter-controls">
+          <div className="kubelens-search-container">
             <input
               type="text"
               placeholder="搜索 Pods..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="input"
-              style={{ 
-                fontSize: '14px',
-                width: '100%',
-                paddingLeft: '36px'
-              }}
+              className="kubelens-input"
             />
-            <div style={{ 
-              position: 'absolute', 
-              left: '12px', 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              color: '#9ca3af' 
-            }}>
-              🔍
-            </div>
+            <div className="kubelens-search-icon">🔍</div>
           </div>
           <select
             value={selectedNamespace}
             onChange={(e) => setSelectedNamespace(e.target.value)}
-            className="select"
-            style={{ minWidth: '150px' }}
+            className="kubelens-select"
           >
             <option value="all">所有命名空间</option>
             {namespaces.map(ns => (
@@ -199,19 +154,22 @@ const Pods: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          alignItems: 'center',
-          color: '#fff',
-          fontSize: '14px',
-          flexWrap: 'wrap'
-        }}>
-          <span>总计: <strong>{filteredPods.length}</strong> 个 Pod</span>
-          <span>运行中: <strong>{filteredPods.filter(p => p.status === 'Running').length}</strong></span>
-          <span>等待中: <strong>{filteredPods.filter(p => p.status === 'Pending').length}</strong></span>
-          <span>失败: <strong>{filteredPods.filter(p => p.status === 'Failed').length}</strong></span>
+      <div className="kubelens-stats">
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">总计 Pods</div>
+          <div className="kubelens-stat-value">{filteredPods.length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">运行中</div>
+          <div className="kubelens-stat-value">{filteredPods.filter(p => p.status === 'Running').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">等待中</div>
+          <div className="kubelens-stat-value">{filteredPods.filter(p => p.status === 'Pending').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">失败</div>
+          <div className="kubelens-stat-value">{filteredPods.filter(p => p.status === 'Failed').length}</div>
         </div>
       </div>
 

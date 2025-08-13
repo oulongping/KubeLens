@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 interface Column {
   key: string;
   title: string;
   width?: string;
-  render?: (value: any, record: any) => React.ReactNode;
+  render?: (value: any, row?: any) => React.ReactNode;
 }
 
 interface TableProps {
@@ -14,7 +14,7 @@ interface TableProps {
   sortable?: boolean;
 }
 
-const Table: React.FC<TableProps> = ({ columns, data, loading, sortable = false }) => {
+const Table: React.FC<TableProps> = ({ columns, data, loading = false, sortable = false }) => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' } | null>(null);
 
   const handleSort = (key: string) => {
@@ -27,7 +27,7 @@ const Table: React.FC<TableProps> = ({ columns, data, loading, sortable = false 
     setSortConfig({ key, direction });
   };
 
-  const getSortedData = () => {
+  const getSortedData = useMemo(() => {
     if (!sortConfig) return data;
     
     return [...data].sort((a, b) => {
@@ -39,58 +39,46 @@ const Table: React.FC<TableProps> = ({ columns, data, loading, sortable = false 
       }
       return 0;
     });
-  };
+  }, [data, sortConfig]);
 
-  const sortedData = sortConfig ? getSortedData() : data;
+  const sortedData = getSortedData;
 
   if (loading) {
     return (
-      <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-        <div className="loading-spinner"></div>
-        <div style={{ marginTop: '16px', color: '#6b7280' }}>加载中...</div>
+      <div className="kubelens-table-loading">
+        <div className="kubelens-loading-spinner"></div>
+        <div className="kubelens-table-loading-text">正在加载数据...</div>
       </div>
     );
   }
 
-  if (data.length === 0) {
+  if (sortedData.length === 0) {
     return (
-      <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-        <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>
-        <div style={{ color: '#6b7280', fontSize: '16px' }}>暂无数据</div>
+      <div className="kubelens-table-empty">
+        <div className="kubelens-table-empty-icon">📋</div>
+        <div className="kubelens-table-empty-text">暂无数据</div>
+        <div className="kubelens-table-empty-subtext">请检查您的集群或稍后重试</div>
       </div>
     );
   }
 
   return (
-    <div className="card" style={{ overflow: 'hidden' }}>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ 
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              borderBottom: '2px solid #e2e8f0'
-            }}>
+    <div className="kubelens-table">
+      <div className="kubelens-table-container">
+        <table className="kubelens-table-content">
+          <thead className="kubelens-table-header">
+            <tr>
               {columns.map((column) => (
-                <th
+                <th 
                   key={column.key}
-                  style={{
-                    padding: '16px 20px',
-                    textAlign: 'left',
-                    fontWeight: 600,
-                    fontSize: '14px',
-                    color: '#374151',
-                    width: column.width,
-                    letterSpacing: '0.025em',
-                    cursor: sortable ? 'pointer' : 'default',
-                    userSelect: 'none',
-                    position: 'relative'
-                  }}
+                  className={`kubelens-table-header-cell ${sortable && column.key !== 'actions' ? 'sortable' : ''}`}
+                  style={{ width: column.width }}
                   onClick={() => handleSort(column.key)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>{column.title}</span>
+                  <div className="kubelens-table-header-content">
+                    {column.title}
                     {sortable && sortConfig && sortConfig.key === column.key && (
-                      <span>
+                      <span className="kubelens-table-sort-indicator">
                         {sortConfig.direction === 'asc' ? '↑' : '↓'}
                       </span>
                     )}
@@ -100,28 +88,11 @@ const Table: React.FC<TableProps> = ({ columns, data, loading, sortable = false 
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((record, index) => (
-              <tr
-                key={index}
-                style={{
-                  borderBottom: '1px solid #f1f5f9',
-                  transition: 'all 0.2s ease'
-                }}
-                className="table-row"
-              >
+            {sortedData.map((row, index) => (
+              <tr key={index} className="kubelens-table-row">
                 {columns.map((column) => (
-                  <td
-                    key={column.key}
-                    style={{
-                      padding: '16px 20px',
-                      fontSize: '14px',
-                      color: '#374151',
-                      verticalAlign: 'middle'
-                    }}
-                  >
-                    {column.render
-                      ? column.render(record[column.key], record)
-                      : record[column.key] || '-'}
+                  <td key={column.key} className="kubelens-table-cell">
+                    {column.render ? column.render(row[column.key], row) : row[column.key]}
                   </td>
                 ))}
               </tr>

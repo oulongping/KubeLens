@@ -64,26 +64,18 @@ const Events: React.FC = () => {
 
   const getReasonBadge = (reason: string) => {
     const reasonColors: { [key: string]: string } = {
-      'Created': '#10b981',
-      'Started': '#3b82f6',
-      'Pulled': '#8b5cf6',
-      'Scheduled': '#06b6d4',
-      'Failed': '#ef4444',
-      'Killing': '#f59e0b',
-      'FailedMount': '#ef4444',
-      'Unhealthy': '#f59e0b'
+      'Created': 'success',
+      'Started': 'info',
+      'Pulled': 'purple',
+      'Scheduled': 'cyan',
+      'Failed': 'error',
+      'Killing': 'warning',
+      'FailedMount': 'error',
+      'Unhealthy': 'warning'
     };
-    const color = reasonColors[reason] || '#6b7280';
+    const colorClass = reasonColors[reason] || 'default';
     return (
-      <span style={{ 
-        padding: '4px 8px', 
-        background: `${color}15`, 
-        color: color,
-        borderRadius: '4px', 
-        fontSize: '12px',
-        fontWeight: 500,
-        border: `1px solid ${color}30`
-      }}>
+      <span className={`kubelens-reason-badge kubelens-reason-badge-${colorClass}`}>
         {reason}
       </span>
     );
@@ -134,12 +126,7 @@ const Events: React.FC = () => {
       title: '对象',
       width: '200px',
       render: (value: string) => (
-        <code style={{ 
-          background: '#f1f5f9', 
-          padding: '2px 6px', 
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
+        <code className="kubelens-code kubelens-code-object">
           {value}
         </code>
       )
@@ -149,13 +136,7 @@ const Events: React.FC = () => {
       title: '命名空间',
       width: '120px',
       render: (value: string) => (
-        <span style={{ 
-          padding: '4px 8px', 
-          background: '#f3f4f6', 
-          borderRadius: '4px', 
-          fontSize: '12px',
-          fontWeight: 500
-        }}>
+        <span className="kubelens-namespace-badge">
           {value || 'default'}
         </span>
       )
@@ -164,13 +145,7 @@ const Events: React.FC = () => {
       key: 'message',
       title: '消息',
       render: (value: string) => (
-        <div style={{ 
-          maxWidth: '300px', 
-          overflow: 'hidden', 
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          fontSize: '13px'
-        }} title={value}>
+        <div className="kubelens-message-cell" title={value}>
           {value}
         </div>
       )
@@ -180,10 +155,7 @@ const Events: React.FC = () => {
       title: '次数',
       width: '80px',
       render: (value: number) => (
-        <span style={{ 
-          color: value > 1 ? '#f59e0b' : '#6b7280',
-          fontWeight: value > 1 ? 600 : 400
-        }}>
+        <span className={`kubelens-count-cell ${value > 1 ? 'kubelens-count-warning' : ''}`}>
           {value}
         </span>
       )
@@ -193,7 +165,7 @@ const Events: React.FC = () => {
       title: '最后发生',
       width: '120px',
       render: (value: string) => (
-        <span style={{ fontSize: '12px', color: '#6b7280' }}>
+        <span className="kubelens-time-cell">
           {formatTime(value)}
         </span>
       )
@@ -201,51 +173,32 @@ const Events: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px' 
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          📋 事件
-        </h1>
+    <div className="kubelens-events">
+      <div className="kubelens-events-header">
         <button 
           onClick={fetchData}
-          className="btn btn-primary"
-          style={{ padding: '12px 24px' }}
+          className="kubelens-btn kubelens-btn-primary"
         >
           🔄 刷新
         </button>
       </div>
 
-      <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr auto auto', 
-          gap: '16px', 
-          alignItems: 'center' 
-        }}>
-          <input
-            type="text"
-            placeholder="搜索事件..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input"
-            style={{ fontSize: '14px' }}
-          />
+      <div className="kubelens-card kubelens-events-filters">
+        <div className="kubelens-events-filter-controls">
+          <div className="kubelens-search-container">
+            <span className="kubelens-search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="搜索事件..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="kubelens-input"
+            />
+          </div>
           <select
             value={selectedNamespace}
             onChange={(e) => setSelectedNamespace(e.target.value)}
-            className="select"
-            style={{ minWidth: '150px' }}
+            className="kubelens-select"
           >
             <option value="all">所有命名空间</option>
             {namespaces.map(ns => (
@@ -255,8 +208,7 @@ const Events: React.FC = () => {
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="select"
-            style={{ minWidth: '120px' }}
+            className="kubelens-select"
           >
             <option value="all">所有类型</option>
             {eventTypes.map(type => (
@@ -266,18 +218,22 @@ const Events: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          alignItems: 'center',
-          color: '#fff',
-          fontSize: '14px'
-        }}>
-          <span>总计: <strong>{filteredEvents.length}</strong> 个事件</span>
-          <span>正常: <strong>{filteredEvents.filter(e => e.type === 'Normal').length}</strong></span>
-          <span>警告: <strong>{filteredEvents.filter(e => e.type === 'Warning').length}</strong></span>
-          <span>错误: <strong>{filteredEvents.filter(e => e.type === 'Error').length}</strong></span>
+      <div className="kubelens-stats">
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">总计事件</div>
+          <div className="kubelens-stat-value">{filteredEvents.length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">正常</div>
+          <div className="kubelens-stat-value">{filteredEvents.filter(e => e.type === 'Normal').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">警告</div>
+          <div className="kubelens-stat-value">{filteredEvents.filter(e => e.type === 'Warning').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">错误</div>
+          <div className="kubelens-stat-value">{filteredEvents.filter(e => e.type === 'Error').length}</div>
         </div>
       </div>
 

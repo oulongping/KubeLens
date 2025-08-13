@@ -78,13 +78,7 @@ const Services: React.FC = () => {
       title: '命名空间',
       width: '150px',
       render: (value: string) => (
-        <span style={{ 
-          padding: '4px 8px', 
-          background: '#f3f4f6', 
-          borderRadius: '4px', 
-          fontSize: '12px',
-          fontWeight: 500
-        }}>
+        <span className="kubelens-namespace-badge">
           {value}
         </span>
       )
@@ -100,12 +94,7 @@ const Services: React.FC = () => {
       title: '集群 IP',
       width: '140px',
       render: (value: string) => (
-        <code style={{ 
-          background: '#f1f5f9', 
-          padding: '2px 6px', 
-          borderRadius: '4px',
-          fontSize: '12px'
-        }}>
+        <code className="kubelens-code kubelens-code-object">
           {value || '-'}
         </code>
       )
@@ -116,13 +105,7 @@ const Services: React.FC = () => {
       width: '140px',
       render: (value: string) => (
         value ? (
-          <code style={{ 
-            background: '#ecfdf5', 
-            color: '#065f46',
-            padding: '2px 6px', 
-            borderRadius: '4px',
-            fontSize: '12px'
-          }}>
+          <code className="kubelens-code kubelens-code-external-ip">
             {value}
           </code>
         ) : '-'
@@ -137,16 +120,7 @@ const Services: React.FC = () => {
         if (typeof value === 'string') return value;
         if (Array.isArray(value)) {
           return value.map((port: any, index: number) => (
-            <div key={index} style={{ 
-              display: 'inline-block',
-              margin: '2px',
-              padding: '2px 6px',
-              background: '#e0f2fe',
-              color: '#0277bd',
-              borderRadius: '4px',
-              fontSize: '11px',
-              fontWeight: 500
-            }}>
+            <div key={index} className="kubelens-port-badge">
               {port.port || port.targetPort}{port.protocol ? `/${port.protocol}` : ''}
               {port.nodePort ? `:${port.nodePort}` : ''}
             </div>
@@ -154,14 +128,7 @@ const Services: React.FC = () => {
         }
         // Single port object
         return (
-          <span style={{ 
-            padding: '2px 6px',
-            background: '#e0f2fe',
-            color: '#0277bd',
-            borderRadius: '4px',
-            fontSize: '11px',
-            fontWeight: 500
-          }}>
+          <span className="kubelens-port-badge">
             {value.port || value.targetPort}{value.protocol ? `/${value.protocol}` : ''}
             {value.nodePort ? `:${value.nodePort}` : ''}
           </span>
@@ -175,51 +142,32 @@ const Services: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px' 
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          🌐 服务
-        </h1>
+    <div className="kubelens-services">
+      <div className="kubelens-services-header">
         <button 
           onClick={fetchData}
-          className="btn btn-primary"
-          style={{ padding: '12px 24px' }}
+          className="kubelens-btn kubelens-btn-primary"
         >
           🔄 刷新
         </button>
       </div>
 
-      <div className="card" style={{ padding: '24px', marginBottom: '24px' }}>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr auto', 
-          gap: '16px', 
-          alignItems: 'center' 
-        }}>
-          <input
-            type="text"
-            placeholder="搜索服务..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="input"
-            style={{ fontSize: '14px' }}
-          />
+      <div className="kubelens-card kubelens-services-filters">
+        <div className="kubelens-services-filter-controls">
+          <div className="kubelens-search-container">
+            <span className="kubelens-search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="搜索服务..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="kubelens-input"
+            />
+          </div>
           <select
             value={selectedNamespace}
             onChange={(e) => setSelectedNamespace(e.target.value)}
-            className="select"
-            style={{ minWidth: '150px' }}
+            className="kubelens-select"
           >
             <option value="all">所有命名空间</option>
             {namespaces.map(ns => (
@@ -229,18 +177,22 @@ const Services: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '16px', 
-          alignItems: 'center',
-          color: '#fff',
-          fontSize: '14px'
-        }}>
-          <span>总计: <strong>{filteredServices.length}</strong> 个服务</span>
-          <span>ClusterIP: <strong>{filteredServices.filter(s => s.type === 'ClusterIP').length}</strong></span>
-          <span>NodePort: <strong>{filteredServices.filter(s => s.type === 'NodePort').length}</strong></span>
-          <span>LoadBalancer: <strong>{filteredServices.filter(s => s.type === 'LoadBalancer').length}</strong></span>
+      <div className="kubelens-stats">
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">总计服务</div>
+          <div className="kubelens-stat-value">{filteredServices.length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">ClusterIP</div>
+          <div className="kubelens-stat-value">{filteredServices.filter(s => s.type === 'ClusterIP').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">NodePort</div>
+          <div className="kubelens-stat-value">{filteredServices.filter(s => s.type === 'NodePort').length}</div>
+        </div>
+        <div className="kubelens-stat-card">
+          <div className="kubelens-stat-label">LoadBalancer</div>
+          <div className="kubelens-stat-value">{filteredServices.filter(s => s.type === 'LoadBalancer').length}</div>
         </div>
       </div>
 

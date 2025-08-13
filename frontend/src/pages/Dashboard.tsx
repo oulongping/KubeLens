@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Table from '../components/Table';
+import StatCard from '../components/StatCard';
 
 interface Summary {
   totalPods: number;
@@ -99,78 +100,26 @@ const Dashboard: React.FC = () => {
     }
   ];
 
-  const StatCard = ({ title, value, subtitle, icon, color, trend }: any) => (
-    <div className="card hover-lift" style={{ padding: '24px', textAlign: 'center', height: '100%' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start',
-        marginBottom: '16px'
-      }}>
-        <div style={{ fontSize: '28px', color }}>{icon}</div>
-        {trend && (
-          <div style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '4px', 
-            fontSize: '12px', 
-            fontWeight: 500,
-            color: trend > 0 ? '#10b981' : trend < 0 ? '#ef4444' : '#6b7280'
-          }}>
-            {trend > 0 ? '↑' : trend < 0 ? '↓' : '→'}
-            <span>{Math.abs(trend)}%</span>
-          </div>
-        )}
-      </div>
-      <div style={{ fontSize: '28px', fontWeight: 700, color, marginBottom: '4px' }}>
-        {value}
-      </div>
-      <div style={{ fontSize: '16px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>
-        {title}
-      </div>
-      {subtitle && (
-        <div style={{ fontSize: '14px', color: '#6b7280' }}>
-          {subtitle}
-        </div>
-      )}
-    </div>
-  );
+
 
   if (loading) {
     return (
-      <div style={{ padding: '24px' }}>
-        <div className="card" style={{ padding: '48px', textAlign: 'center' }}>
-          <div className="loading-spinner"></div>
-          <div style={{ marginTop: '16px', color: '#6b7280' }}>加载中...</div>
+      <div className="kubelens-dashboard-loading">
+        <div className="kubelens-table-loading">
+          <div className="kubelens-loading-spinner"></div>
+          <div className="kubelens-table-loading-text">正在加载集群数据...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '32px',
-        flexWrap: 'wrap',
-        gap: '16px'
-      }}>
-        <h1 style={{ 
-          fontSize: '32px', 
-          fontWeight: 800, 
-          margin: 0, 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          集群总览
-        </h1>
-        <div style={{ display: 'flex', gap: '12px' }}>
+    <div className="kubelens-dashboard">
+      <div className="kubelens-dashboard-header">
+        <div className="kubelens-dashboard-actions">
           <button 
             onClick={fetchData}
-            className="btn btn-primary"
-            style={{ padding: '12px 24px' }}
+            className="kubelens-btn kubelens-btn-primary"
           >
             🔄 刷新
           </button>
@@ -178,58 +127,32 @@ const Dashboard: React.FC = () => {
       </div>
 
       {summary && (
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', 
-          gap: '20px', 
-          marginBottom: '32px' 
-        }}>
-          <StatCard
-            title="Pods"
-            value={summary.totalPods}
-            subtitle={`${summary.runningPods} 运行中`}
-            icon="🚀"
-            color="#3b82f6"
-            trend={2.5}
-          />
-          <StatCard
-            title="节点"
-            value={summary.totalNodes}
-            subtitle={`${summary.readyNodes} 就绪`}
-            icon="🖥️"
-            color="#10b981"
-            trend={0}
-          />
-          <StatCard
-            title="服务"
-            value={summary.totalServices}
-            subtitle="活跃服务"
-            icon="🌐"
-            color="#8b5cf6"
-            trend={-1.2}
-          />
-          <StatCard
-            title="工作负载"
-            value={summary.totalWorkloads}
-            subtitle="部署应用"
-            icon="⚙️"
-            color="#f59e0b"
-            trend={5.7}
-          />
+        <div className="kubelens-stats">
+          <div className="kubelens-stat-card">
+            <div className="kubelens-stat-label">Pods</div>
+            <div className="kubelens-stat-value">{summary.totalPods}</div>
+            <div className="kubelens-stat-subtitle">{summary.runningPods} 运行中</div>
+          </div>
+          <div className="kubelens-stat-card">
+            <div className="kubelens-stat-label">节点</div>
+            <div className="kubelens-stat-value">{summary.totalNodes}</div>
+            <div className="kubelens-stat-subtitle">{summary.readyNodes} 就绪</div>
+          </div>
+          <div className="kubelens-stat-card">
+            <div className="kubelens-stat-label">服务</div>
+            <div className="kubelens-stat-value">{summary.totalServices}</div>
+            <div className="kubelens-stat-subtitle">活跃服务</div>
+          </div>
+          <div className="kubelens-stat-card">
+            <div className="kubelens-stat-label">工作负载</div>
+            <div className="kubelens-stat-value">{summary.totalWorkloads}</div>
+            <div className="kubelens-stat-subtitle">部署应用</div>
+          </div>
         </div>
       )}
 
-      <div style={{ marginBottom: '24px' }}>
-        <h2 style={{ 
-          fontSize: '24px', 
-          fontWeight: 700, 
-          margin: '0 0 20px 0', 
-          color: '#fff',
-          textShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
+      <div className="kubelens-card">
+        <h2 className="kubelens-dashboard-section-title">
           <span>📋</span>
           <span>最近事件</span>
         </h2>
