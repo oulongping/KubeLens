@@ -1664,3 +1664,192 @@ body.dark-theme .kubelens-port-badge {
   background: #0c4a6e;
   color: #38bdf8;
 }
+
+/* 模态框样式 */
+.kubelens-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.kubelens-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+body.dark-theme .kubelens-modal {
+  background: #1f2937;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.kubelens-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+body.dark-theme .kubelens-modal-header {
+  border-bottom-color: #374151;
+}
+
+.kubelens-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.dark-theme .kubelens-modal-header h3 {
+  color: #f9fafb;
+}
+
+.kubelens-modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.kubelens-modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+body.dark-theme .kubelens-modal-close:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.kubelens-modal-content {
+  padding: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.kubelens-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+body.dark-theme .kubelens-modal-footer {
+  border-top-color: #374151;
+}
+
+/* Pod 信息样式 */
+.kubelens-pod-info {
+  padding: 16px 24px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+body.dark-theme .kubelens-pod-info {
+  background: #111827;
+  border-bottom-color: #374151;
+}
+
+.kubelens-pod-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.kubelens-pod-details {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+body.dark-theme .kubelens-pod-details {
+  color: #9ca3af;
+}
+
+/* 日志容器样式 */
+.kubelens-logs-container {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.kubelens-logs-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #6b7280;
+}
+
+body.dark-theme .kubelens-logs-loading {
+  color: #9ca3af;
+}
+
+.kubelens-logs-content {
+  flex: 1;
+  margin: 0;
+  padding: 16px 24px;
+  background: #111827;
+  color: #e5e7eb;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.kubelens-logs-content:empty::before {
+  content: '没有日志内容';
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* 按钮尺寸变体 */
+.kubelens-btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+}

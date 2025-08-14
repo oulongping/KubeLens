@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -168,4 +169,31 @@ func GetSummaryHandlerFunc(c *gin.Context) {
 
 func GetNotificationsHandlerFunc(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"items": []interface{}{}})
+}
+
+// GetPodLogsHandlerFunc 处理获取Pod日志的请求
+func GetPodLogsHandlerFunc(c *gin.Context) {
+	namespace := c.Param("namespace")
+	podName := c.Param("podName")
+	
+	if namespace == "" || podName == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "namespace and podName are required"})
+		return
+	}
+	
+	// 获取tailLines参数，默认获取最新100行
+	tailLines := int64(100)
+	if tailParam := c.Query("tail"); tailParam != "" {
+		if parsed, err := strconv.ParseInt(tailParam, 10, 64); err == nil {
+			tailLines = parsed
+		}
+	}
+	
+	logs, err := K8sClient.GetPodLogs(context.Background(), namespace, podName, &tailLines)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"logs": logs})
 }

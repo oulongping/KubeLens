@@ -17,6 +17,12 @@ const Pods: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedNamespace, setSelectedNamespace] = useState('all');
   const [namespaces, setNamespaces] = useState<string[]>([]);
+  
+  // 日志相关状态
+  const [selectedPod, setSelectedPod] = useState<Pod | null>(null);
+  const [logs, setLogs] = useState('');
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,6 +46,36 @@ const Pods: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // 获取Pod日志
+  const fetchPodLogs = async (pod: Pod) => {
+    setSelectedPod(pod);
+    setShowLogsModal(true);
+    setLogsLoading(true);
+    setLogs('');
+    
+    try {
+      const response = await fetch(`/api/pods/${pod.namespace}/${pod.name}/logs?tail=200`);
+      if (response.ok) {
+        const data = await response.json();
+        setLogs(data.logs || '没有找到日志');
+      } else {
+        setLogs('获取日志失败');
+      }
+    } catch (error) {
+      console.error('Failed to fetch pod logs:', error);
+      setLogs('获取日志失败');
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
+  // 关闭日志模态框
+  const closeLogsModal = () => {
+    setShowLogsModal(false);
+    setSelectedPod(null);
+    setLogs('');
   };
 
   useEffect(() => {
@@ -113,6 +149,20 @@ const Pods: React.FC = () => {
     {
       key: 'node',
       title: '节点'
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '100px',
+      render: (_: any, row: Pod) => (
+        <button
+          onClick={() => fetchPodLogs(row)}
+          className="kubelens-btn kubelens-btn-sm kubelens-btn-secondary"
+          title="查看日志"
+        >
+          📋 日志
+        </button>
+      )
     }
   ];
 
@@ -179,6 +229,65 @@ const Pods: React.FC = () => {
         loading={loading}
         sortable
       />
+
+      {/* 日志模态框 */}
+      {showLogsModal && (
+        <div className="kubelens-modal-overlay" onClick={closeLogsModal}>
+          <div className="kubelens-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="kubelens-modal-header">
+              <h3>
+                <span>📋</span>
+                <span>Pod 日志 - {selectedPod?.name}</span>
+              </h3>
+              <button 
+                onClick={closeLogsModal}
+                className="kubelens-modal-close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="kubelens-modal-content">
+              {selectedPod && (
+                <div className="kubelens-pod-info">
+                  <div className="kubelens-pod-meta">
+                    <span className="kubelens-namespace-badge">{selectedPod.namespace}</span>
+                    <span className={`status-badge status-${
+                      selectedPod.status === 'Running' ? 'success' : 
+                      selectedPod.status === 'Pending' ? 'warning' : 
+                      selectedPod.status === 'Failed' ? 'error' : 'default'
+                    }`}>
+                      {selectedPod.status}
+                    </span>
+                  </div>
+                  <div className="kubelens-pod-details">
+                    <span>节点: {selectedPod.node}</span>
+                    <span>就绪: {selectedPod.ready}</span>
+                    <span>重启: {selectedPod.restarts}</span>
+                  </div>
+                </div>
+              )}
+              <div className="kubelens-logs-container">
+                {logsLoading ? (
+                  <div className="kubelens-logs-loading">
+                    <div className="kubelens-loading-spinner"></div>
+                    <div>正在加载日志...</div>
+                  </div>
+                ) : (
+                  <pre className="kubelens-logs-content">{logs}</pre>
+                )}
+              </div>
+            </div>
+            <div className="kubelens-modal-footer">
+              <button 
+                onClick={closeLogsModal}
+                className="kubelens-btn kubelens-btn-secondary"
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

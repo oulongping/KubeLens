@@ -420,3 +420,35 @@ func getExternalIP(svc corev1.Service) string {
 	}
 	return "<none>"
 }
+
+// GetPodLogs 获取指定Pod的日志
+func (c *Client) GetPodLogs(ctx context.Context, namespace, podName string, tailLines *int64) (string, error) {
+	// 设置日志获取选项
+	options := &corev1.PodLogOptions{}
+	if tailLines != nil {
+		options.TailLines = tailLines
+	}
+
+	// 获取日志流
+	req := c.Clientset.CoreV1().Pods(namespace).GetLogs(podName, options)
+	logStream, err := req.Stream(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get log stream: %w", err)
+	}
+	defer logStream.Close()
+
+	// 读取日志内容
+	buf := make([]byte, 1024)
+	var logs strings.Builder
+	for {
+		n, err := logStream.Read(buf)
+		if n > 0 {
+			logs.Write(buf[:n])
+		}
+		if err != nil {
+			break
+		}
+	}
+
+	return logs.String(), nil
+}
