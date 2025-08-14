@@ -197,3 +197,36 @@ func GetPodLogsHandlerFunc(c *gin.Context) {
 	
 	c.JSON(http.StatusOK, gin.H{"logs": logs})
 }
+
+// RestartWorkloadHandlerFunc 处理重启工作负载的请求
+func RestartWorkloadHandlerFunc(c *gin.Context) {
+	namespace := c.Param("namespace")
+	name := c.Param("name")
+	kind := c.Param("kind")
+
+	if namespace == "" || name == "" || kind == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "namespace, name and kind are required"})
+		return
+	}
+
+	// 验证kind参数
+	supportedKinds := map[string]bool{
+		"Deployment":  true,
+		"StatefulSet": true,
+		"DaemonSet":   true,
+	}
+
+	if !supportedKinds[kind] {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("unsupported workload kind: %s", kind)})
+		return
+	}
+
+	// 重启工作负载
+	err := K8sClient.RestartWorkload(context.Background(), namespace, name, kind)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("Successfully restarted %s %s in namespace %s", kind, name, namespace)})
+}

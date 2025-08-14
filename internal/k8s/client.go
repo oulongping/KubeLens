@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -451,4 +452,87 @@ func (c *Client) GetPodLogs(ctx context.Context, namespace, podName string, tail
 	}
 
 	return logs.String(), nil
+}
+
+// RestartWorkload 重启工作负载
+// kind: Deployment, StatefulSet, DaemonSet
+func (c *Client) RestartWorkload(ctx context.Context, namespace, name, kind string) error {
+	// 添加重启注解以触发滚动更新
+	annotations := map[string]string{
+		"kubectl.kubernetes.io/restartedAt": time.Now().Format(time.RFC3339),
+	}
+
+	switch kind {
+	case "Deployment":
+		// 获取现有的Deployment
+		deployment, err := c.Clientset.AppsV1().Deployments(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to get deployment: %w", err)
+		}
+
+		// 更新注解
+		if deployment.Spec.Template.Annotations == nil {
+			deployment.Spec.Template.Annotations = make(map[string]string)
+		}
+		for k, v := range annotations {
+			deployment.Spec.Template.Annotations[k] = v
+		}
+
+		// 更新Deployment
+		_, err = c.Clientset.AppsV1().Deployments(namespace).Update(ctx, deployment, metav1.UpdateOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to update deployment: %w", err)
+		}
+
+		return nil
+
+	case "StatefulSet":
+		// 获取现有的StatefulSet
+		statefulSet, err := c.Clientset.AppsV1().StatefulSets(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to get statefulset: %w", err)
+		}
+
+		// 更新注解
+		if statefulSet.Spec.Template.Annotations == nil {
+			statefulSet.Spec.Template.Annotations = make(map[string]string)
+		}
+		for k, v := range annotations {
+			statefulSet.Spec.Template.Annotations[k] = v
+		}
+
+		// 更新StatefulSet
+		_, err = c.Clientset.AppsV1().StatefulSets(namespace).Update(ctx, statefulSet, metav1.UpdateOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to update statefulset: %w", err)
+		}
+
+		return nil
+
+	case "DaemonSet":
+		// 获取现有的DaemonSet
+		daemonSet, err := c.Clientset.AppsV1().DaemonSets(namespace).Get(ctx, name, metav1.GetOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to get daemonset: %w", err)
+		}
+
+		// 更新注解
+		if daemonSet.Spec.Template.Annotations == nil {
+			daemonSet.Spec.Template.Annotations = make(map[string]string)
+		}
+		for k, v := range annotations {
+			daemonSet.Spec.Template.Annotations[k] = v
+		}
+
+		// 更新DaemonSet
+		_, err = c.Clientset.AppsV1().DaemonSets(namespace).Update(ctx, daemonSet, metav1.UpdateOptions{})
+		if err != nil {
+			return fmt.Errorf("failed to update daemonset: %w", err)
+		}
+
+		return nil
+
+	default:
+		return fmt.Errorf("unsupported workload kind: %s", kind)
+	}
 }

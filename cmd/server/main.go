@@ -69,6 +69,7 @@ func main() {
 	r.GET("/api/summary", k8s.GetSummaryHandlerFunc)
 	r.GET("/api/notifications", k8s.GetNotificationsHandlerFunc)
 	r.GET("/api/pods/:namespace/:podName/logs", k8s.GetPodLogsHandlerFunc)
+	r.POST("/api/workloads/:namespace/:name/:kind/restart", k8s.RestartWorkloadHandlerFunc)
 
 	log.Printf("Starting KubeLens server on %s", listenAddr)
 	if err := r.Run(listenAddr); err != nil {

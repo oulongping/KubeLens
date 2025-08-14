@@ -18,6 +18,8 @@ const Workloads: React.FC = () => {
   const [selectedNamespace, setSelectedNamespace] = useState('all');
   const [selectedKind, setSelectedKind] = useState('all');
   const [namespaces, setNamespaces] = useState<string[]>([]);
+  const [restarting, setRestarting] = useState<{[key: string]: boolean}>({});
+  const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,6 +42,37 @@ const Workloads: React.FC = () => {
       console.error('Failed to fetch data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const restartWorkload = async (workload: Workload) => {
+    const workloadKey = `${workload.namespace}/${workload.name}/${workload.kind}`;
+    
+    // 设置正在重启状态
+    setRestarting(prev => ({ ...prev, [workloadKey]: true }));
+    setError(null);
+    
+    try {
+      const response = await fetch(`/api/workloads/${workload.namespace}/${workload.name}/${workload.kind}/restart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to restart workload');
+      }
+      
+      // 重启成功，刷新数据
+      await fetchData();
+    } catch (error: any) {
+      console.error('Failed to restart workload:', error);
+      setError(error.message || 'Failed to restart workload');
+    } finally {
+      // 清除正在重启状态
+      setRestarting(prev => ({ ...prev, [workloadKey]: false }));
     }
   };
 
@@ -138,11 +171,41 @@ const Workloads: React.FC = () => {
     {
       key: 'age',
       title: '运行时间'
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: '100px',
+      render: (_: any, row: Workload) => {
+        const workloadKey = `${row.namespace}/${row.name}/${row.kind}`;
+        const isRestarting = restarting[workloadKey] || false;
+        
+        return (
+          <button 
+            onClick={() => restartWorkload(row)}
+            disabled={isRestarting}
+            className={`kubelens-btn kubelens-btn-secondary kubelens-btn-small ${isRestarting ? 'kubelens-btn-loading' : ''}`}
+          >
+            {isRestarting ? '重启中...' : '重启'}
+          </button>
+        );
+      }
     }
   ];
 
   return (
     <div className="kubelens-workloads">
+      {error && (
+        <div className="kubelens-alert kubelens-alert-error">
+          <span>{error}</span>
+          <button 
+            className="kubelens-alert-close" 
+            onClick={() => setError(null)}
+          >
+            &times;
+          </button>
+        </div>
+      )}
       <div className="kubelens-workloads-header">
         <button 
           onClick={fetchData}
