@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"log"
 	"path/filepath"
 	"strings"
 	"time"
@@ -228,6 +229,30 @@ func (c *Client) GetNodes(ctx context.Context) ([]map[string]interface{}, error)
 	}
 
 	return nodes, nil
+}
+
+// GetNodeMetrics returns metrics for all nodes
+func (c *Client) GetNodeMetrics(ctx context.Context) ([]map[string]interface{}, error) {
+	// Get node metrics from metrics server
+	metricsList, err := c.MetricsClient.MetricsV1beta1().NodeMetricses().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		log.Printf("Error getting node metrics: %v", err)
+		return nil, fmt.Errorf("failed to get node metrics: metrics server not available or not properly configured: %w", err)
+	}
+
+	log.Printf("Retrieved %d node metrics", len(metricsList.Items))
+
+	var metrics []map[string]interface{}
+	for _, metric := range metricsList.Items {
+		metrics = append(metrics, map[string]interface{}{
+			"name":       metric.Name,
+			"cpuUsage":   metric.Usage.Cpu().MilliValue(),
+			"memoryUsage": metric.Usage.Memory().MilliValue(),
+		})
+	}
+
+	log.Printf("Processed %d node metrics", len(metrics))
+	return metrics, nil
 }
 
 // GetEvents returns a list of events

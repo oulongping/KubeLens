@@ -19,6 +19,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
     { path: '/pods', label: 'Pods', icon: '🚀' },
     { path: '/workloads', label: '工作负载', icon: '⚙️' },
     { path: '/nodes', label: '节点', icon: '🖥️' },
+    { path: '/node-metrics', label: '节点资源监控', icon: '📈' },
     { path: '/services', label: '服务', icon: '🌐' },
     { path: '/events', label: '事件', icon: '📋' }
   ];

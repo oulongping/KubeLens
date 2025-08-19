@@ -74,7 +74,15 @@ func GetEventsHandlerFunc(c *gin.Context) {
 }
 
 func GetNodeMetricsHandlerFunc(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"items": []map[string]interface{}{{}}})
+	log.Printf("Received request for node metrics")
+	metrics, err := K8sClient.GetNodeMetrics(context.Background())
+	if err != nil {
+		log.Printf("Error getting node metrics: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve node metrics. The metrics server may not be available or not properly configured. Please check your Kubernetes cluster setup."})
+		return
+	}
+	log.Printf("Successfully retrieved %d node metrics", len(metrics))
+	c.JSON(http.StatusOK, gin.H{"items": metrics})
 }
 
 func GetPodMetricsHandlerFunc(c *gin.Context) {

@@ -6,6 +6,7 @@ import Nodes from './pages/Nodes';
 import Workloads from './pages/Workloads';
 import Events from './pages/Events';
 import Services from './pages/Services';
+import NodeMetrics from './pages/NodeMetrics';
 import Sidebar from './components/Sidebar';
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
             {location.pathname === '/pods' && '🚀 Pods'}
             {location.pathname === '/workloads' && '⚙️ 工作负载'}
             {location.pathname === '/nodes' && '🖥️ 节点'}
+            {location.pathname === '/node-metrics' && '📈 节点资源监控'}
             {location.pathname === '/services' && '🌐 服务'}
             {location.pathname === '/events' && '📋 事件'}
           </h1>
@@ -92,6 +94,7 @@ function App() {
             <Route path="/pods" element={<Pods />} />
             <Route path="/workloads" element={<Workloads />} />
             <Route path="/nodes" element={<Nodes />} />
+            <Route path="/node-metrics" element={<NodeMetrics />} />
             <Route path="/services" element={<Services />} />
             <Route path="/events" element={<Events />} />
           </Routes>
